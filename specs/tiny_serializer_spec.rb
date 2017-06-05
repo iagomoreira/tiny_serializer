@@ -3,18 +3,52 @@ require 'tiny_serializer'
 require 'ostruct'
 
 RSpec.describe TinySerializer do
-  let!(:dummy) do
-    class FooSerializer < TinySerializer
-      attributes :foo
+  let(:object) { OpenStruct.new(foo: :bar) }
+
+  context 'when serializer does not have custom method' do
+    let!(:dummy) do
+      class FooSerializer < TinySerializer
+        attributes :foo
+      end
+    end
+
+    subject(:serializer) { FooSerializer.new(object) }
+
+    describe 'to_h' do
+      subject { serializer.to_h }
+
+      it { is_expected.to eq({foo: :bar}) }
+    end
+
+    describe 'to_json' do
+      subject { serializer.to_json }
+
+      it { is_expected.to eq('{"foo":"bar"}')}
     end
   end
 
-  let(:object) { OpenStruct.new(foo: :bar) }
-  subject(:serializer) { described_class.new(object) }
+  context 'when serializer has custom method' do
+    let!(:dummy) do
+      class FooSerializer < TinySerializer
+        attributes :foo, :bar
 
-  describe 'to_h' do
-    subject { serializer.to_h }
+        def bar
+          :foo
+        end
+      end
+    end
+    subject(:serializer) { FooSerializer.new(object) }
 
-    it { is_expected.to eq({foo: :bar}) }
+    describe 'to_h' do
+      subject { serializer.to_h }
+
+      it { is_expected.to eq({foo: :bar, bar: :foo}) }
+    end
+
+    describe 'to_json' do
+      subject { serializer.to_json }
+
+      it { is_expected.to eq('{"foo":"bar","bar":"foo"}')}
+    end
   end
 end
