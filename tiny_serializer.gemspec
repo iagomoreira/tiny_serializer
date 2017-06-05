@@ -9,4 +9,6 @@ Gem::Specification.new do |s|
   s.files       = ['lib/tiny_serializer.rb']
   s.homepage    = 'https://github.com/iagomoreira/tiny_serializer'
   s.license     = 'MIT'
+
+  s.add_runtime_dependency 'rspec', '~> 3'
 end
